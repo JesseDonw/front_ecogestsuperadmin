@@ -94,13 +94,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
+
 const defaultPicture = "https://via.placeholder.com/120";
 
 const profile = ref({
-  username: "JeanDupont",
-  email: "jean.dupont@ecogest.com",
-  firstName: "Jean",
-  lastName: "Dupont",
+  username: "Admin Ad",
+  email: "admin@gmail.com",
+  firstName: "Ad",
+  lastName: "Admin",
   address: "Rue des Entrepreneurs, Cotonou",
   city: "Cotonou",
   country: "Bénin",

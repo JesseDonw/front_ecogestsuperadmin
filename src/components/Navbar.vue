@@ -1,61 +1,4 @@
 <!-- eslint-disable vue/multi-word-component-names -->
-<script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faBell, faUser, faSearch, faCog, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
-import { useUserStore } from "../stores/userStore"; // ✅ Vérifie que le chemin est correct
-
-
-
-
-
-const router = useRouter();
-const showNotifications = ref(false);
-const showProfileMenu = ref(false);
-
-// ✅ Récupérer les données utilisateur depuis Pinia ou localStorage
-const userStore = useUserStore();
-const user = ref(userStore.user || JSON.parse(localStorage.getItem("user") || "{}"));
-
-// ✅ Gestion des dropdowns
-const toggleNotifications = () => {
-  showNotifications.value = !showNotifications.value;
-  showProfileMenu.value = false;
-};
-
-const toggleProfileMenu = () => {
-  showProfileMenu.value = !showProfileMenu.value;
-  showNotifications.value = false;
-};
-
-// ✅ Déconnexion et redirection vers `/login`
-const logout = () => {
-  showProfileMenu.value = false;
-  userStore.logout(); // Déconnexion via Pinia
-  localStorage.removeItem("user"); // Supprimer les données du localStorage
-  router.push("/login");
-};
-
-// ✅ Gestion du clic en dehors des dropdowns
-const closeDropdowns = (event: Event) => {
-  const target = event.target as HTMLElement;
-  if (!target.closest(".notifications") && !target.closest(".profile-menu")) {
-    showNotifications.value = false;
-    showProfileMenu.value = false;
-  }
-};
-
-// ✅ Ajouter et supprimer les écouteurs d'événements
-onMounted(() => {
-  document.addEventListener("click", closeDropdowns);
-});
-
-onUnmounted(() => {
-  document.removeEventListener("click", closeDropdowns);
-});
-</script>
-
 <template>
   <header class="navbar">
     <!-- 🔍 Barre de recherche -->
@@ -82,14 +25,26 @@ onUnmounted(() => {
       </div>
     </div>
 
+    <!-- ✅ Dropdown Notifications -->
+    <transition name="fade">
+      <div v-if="showNotifications" class="dropdown-menu notif-dropdown">
+        <h4>Notifications</h4>
+        <ul>
+          <li>Tâche réussit</li>
+          <li>Tâche réussit</li>
+          <li>Message de l'agent</li>
+        </ul>
+      </div>
+    </transition>
+
     <!-- ✅ Dropdown Profil amélioré -->
     <transition name="fade">
       <div v-if="showProfileMenu" class="dropdown-menu profile-dropdown">
         <div class="profile-header">
-          <img :src="user.profilePicture || 'https://via.placeholder.com/50'" alt="User" class="profile-avatar" />
+          <img :src="user.profilePicture || 'https://via.placeholder.com/50'"  class="profile-avatar" />
           <div>
-            <h4>{{ user.name || 'Utilisateur inconnu' }}</h4>
-            <p>{{ user.email || 'email@example.com' }}</p>
+            <h4>{{ user.name || 'Admin Ad' }}</h4>
+            <p>{{ user.email || 'admin@gmail.com' }}</p>
           </div>
         </div>
         <ul>
@@ -108,8 +63,55 @@ onUnmounted(() => {
   </header>
 </template>
 
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faBell, faUser, faSearch, faCog, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { useUserStore } from "../stores/userStore";
+
+const router = useRouter();
+const showNotifications = ref(false);
+const showProfileMenu = ref(false);
+
+const userStore = useUserStore();
+const user = ref(userStore.user || JSON.parse(localStorage.getItem("user") || "{}"));
+
+const toggleNotifications = () => {
+  showNotifications.value = !showNotifications.value;
+  showProfileMenu.value = false;
+};
+
+const toggleProfileMenu = () => {
+  showProfileMenu.value = !showProfileMenu.value;
+  showNotifications.value = false;
+};
+
+const logout = () => {
+  showProfileMenu.value = false;
+  userStore.logout();
+  localStorage.removeItem("user");
+  router.push("/login");
+};
+
+const closeDropdowns = (event: Event) => {
+  const target = event.target as HTMLElement;
+  if (!target.closest(".notifications") && !target.closest(".profile-menu") && !target.closest(".dropdown-menu")) {
+    showNotifications.value = false;
+    showProfileMenu.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("click", closeDropdowns);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("click", closeDropdowns);
+});
+</script>
+
 <style scoped>
-/* ✅ Navbar */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -122,7 +124,6 @@ onUnmounted(() => {
   position: relative;
 }
 
-/* 🔍 Barre de recherche */
 .search-bar {
   display: flex;
   align-items: center;
@@ -139,14 +140,12 @@ onUnmounted(() => {
   width: 200px;
 }
 
-/* ✅ Icônes de la navbar */
 .navbar-icons {
   display: flex;
   align-items: center;
   gap: 20px;
 }
 
-/* 🔔 Notifications */
 .notifications {
   position: relative;
   cursor: pointer;
@@ -169,7 +168,6 @@ onUnmounted(() => {
   font-weight: bold;
 }
 
-/* 👤 Profil */
 .profile-menu img {
   width: 40px;
   height: 40px;
@@ -177,7 +175,6 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-/* ✅ Dropdown Menu */
 .dropdown-menu {
   position: absolute;
   right: 10px;
@@ -191,7 +188,26 @@ onUnmounted(() => {
   transition: all 0.3s ease-in-out;
 }
 
-/* 👤 Profil Dropdown */
+.notif-dropdown h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.notif-dropdown ul {
+  list-style: none;
+  padding: 0;
+}
+
+.notif-dropdown ul li {
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.notif-dropdown ul li:last-child {
+  border-bottom: none;
+}
+
 .profile-dropdown {
   padding: 0;
   overflow: hidden;
@@ -224,7 +240,6 @@ onUnmounted(() => {
   color: #6b7280;
 }
 
-/* ✅ Liens du menu */
 .profile-dropdown ul {
   list-style: none;
   padding: 0;
@@ -243,10 +258,10 @@ onUnmounted(() => {
   background: #f3f4f6;
 }
 
-/* ✅ Animation */
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.3s ease-in-out;
 }
+
 .fade-enter, .fade-leave-to {
   opacity: 0;
 }
