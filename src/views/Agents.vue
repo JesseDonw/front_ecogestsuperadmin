@@ -9,11 +9,15 @@
     <div class="agents-grid">
       <div v-for="agent in agents" :key="agent.id" class="agent-card">
         <div class="agent-header">
-          <img :src="agent.photo_url || defaultPhoto" alt="Photo de l'agent" class="agent-photo">
+          <img :src="getPhotoUrl(agent.photo_url)" alt="Photo de l'agent" class="agent-photo" />
         </div>
         <div class="agent-body">
           <h2 class="agent-name">{{ agent.nom_agent }} {{ agent.prenom_agent }}</h2>
-          <p class="agent-email">{{ agent.mail_agent }}</p>
+          <p class="agent-role">{{ agent.mail_agent }}</p>
+        </div>
+        <div class="agent-actions">
+          <button class="btn btn-edit" @click="openEditModal(agent)">Modifier</button>
+          <button class="btn btn-delete" @click="deleteAgent(agent.id)">Supprimer</button>
         </div>
       </div>
     </div>
@@ -24,26 +28,54 @@
         <h2 class="modal-title">➕ Ajouter un Agent</h2>
         <form @submit.prevent="addAgent">
           <label>Nom :</label>
-          <input type="text" v-model="newAgent.nom_agent" class="input" required>
+          <input type="text" v-model="newAgent.nom_agent" class="input" required />
 
           <label>Prénom :</label>
-          <input type="text" v-model="newAgent.prenom_agent" class="input" required>
+          <input type="text" v-model="newAgent.prenom_agent" class="input" required />
 
           <label>Email :</label>
-          <input type="email" v-model="newAgent.mail_agent" class="input" required>
+          <input type="email" v-model="newAgent.mail_agent" class="input" required />
 
           <label>Mot de passe :</label>
-          <input type="password" v-model="newAgent.mdp_agent" class="input" required>
+          <input type="password" v-model="newAgent.mdp_agent" class="input" required />
 
           <label>Photo :</label>
-          <input type="file" @change="handleImageUpload" class="input">
+          <input type="file" accept="image/png, image/jpg, image/jpeg" @change="handleImageUpload" class="input" />
           <div v-if="previewPhoto" class="preview">
-            <img :src="previewPhoto" class="preview-photo">
+            <img :src="previewPhoto" class="preview-photo" />
           </div>
 
           <div class="modal-actions">
             <button type="button" @click="closeModal" class="btn-cancel">Annuler</button>
             <button type="submit" class="btn-save">Ajouter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modale pour modifier un agent -->
+    <div v-if="showEditModal && currentAgent" class="modal-overlay">
+      <div class="modal-content">
+        <h2 class="modal-title">✏️ Modifier l'Agent</h2>
+        <form @submit.prevent="updateAgent">
+          <label>Nom :</label>
+          <input type="text" v-model="currentAgent.nom_agent" class="input" required />
+
+          <label>Prénom :</label>
+          <input type="text" v-model="currentAgent.prenom_agent" class="input" required />
+
+          <label>Email :</label>
+          <input type="email" v-model="currentAgent.mail_agent" class="input" required />
+
+          <label>Photo :</label>
+          <input type="file" accept="image/png, image/jpg, image/jpeg" @change="handleEditImageUpload" class="input" />
+          <div v-if="previewEditPhoto || currentAgent.photo_url" class="preview">
+            <img :src="previewEditPhoto || getPhotoUrl(currentAgent.photo_url)" class="preview-photo" />
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" @click="closeEditModal" class="btn-cancel">Annuler</button>
+            <button type="submit" class="btn-save">Mettre à jour</button>
           </div>
         </form>
       </div>
@@ -61,52 +93,59 @@ interface Agent {
   prenom_agent: string;
   mail_agent: string;
   photo_url?: string;
+  photo_agent?: File | null;
 }
 
-const defaultPhoto = "https://via.placeholder.com/150";
-const showModal = ref(false);
 const agents = ref<Agent[]>([]);
+const showModal = ref(false);
+const showEditModal = ref(false);
 const previewPhoto = ref<string | null>(null);
+const previewEditPhoto = ref<string | null>(null);
+const currentAgent = ref<Agent | null>(null);
 
-const newAgent = ref({
+const defaultPhoto = "https://dummyimage.com/80x80/000/fff";
+
+const newAgent = ref<Omit<Agent, "id"> & { mdp_agent: string }>({
   nom_agent: "",
   prenom_agent: "",
   mail_agent: "",
   mdp_agent: "",
-  photo_agent: null as File | null,
+  photo_agent: null,
 });
 
-// ✅ Charger les agents depuis l'API
+const getPhotoUrl = (photoPath?: string) => photoPath ? `http://127.0.0.1:8000/${photoPath}` : defaultPhoto;
+
 const fetchAgents = async () => {
   try {
-    const response = await axios.get("https://fcf6-137-255-41-249.ngrok-free.app/api/agents");
+    const response = await axios.get("http://127.0.0.1:8000/api/agents");
     agents.value = response.data;
   } catch (error) {
-    console.error("Erreur lors du chargement des agents :", error);
+    console.error("Erreur lors de la récupération des agents :", error);
   }
 };
+onMounted(fetchAgents);
 
-// ✅ Ouvrir/Fermer le modal
-const openModal = () => {
-  showModal.value = true;
-};
-
+const openModal = () => showModal.value = true;
 const closeModal = () => {
   showModal.value = false;
+  resetNewAgent();
+};
+
+const resetNewAgent = () => {
   newAgent.value = { nom_agent: "", prenom_agent: "", mail_agent: "", mdp_agent: "", photo_agent: null };
   previewPhoto.value = null;
 };
 
-// ✅ Gérer l'upload de la photo
 const handleImageUpload = (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0];
-  if (file) {
+  if (file && ["image/png", "image/jpg", "image/jpeg"].includes(file.type)) {
     newAgent.value.photo_agent = file;
     previewPhoto.value = URL.createObjectURL(file);
+  } else {
+    alert("Le format de l'image doit être PNG, JPG ou JPEG.");
   }
 };
 
-// ✅ Ajouter un agent via API Laravel
 const addAgent = async () => {
   try {
     const formData = new FormData();
@@ -114,42 +153,162 @@ const addAgent = async () => {
     formData.append("prenom_agent", newAgent.value.prenom_agent);
     formData.append("mail_agent", newAgent.value.mail_agent);
     formData.append("mdp_agent", newAgent.value.mdp_agent);
+    if (newAgent.value.photo_agent) formData.append("photo_agent", newAgent.value.photo_agent);
 
-    if (newAgent.value.photo_agent) {
-      formData.append("photo_agent", newAgent.value.photo_agent);
-    }
+    const response = await axios.post("http://127.0.0.1:8000/api/register", formData);
+    agents.value.push({ ...response.data.agent, photo_url: response.data.photo_url || previewPhoto.value });
 
-    console.log("Données envoyées :", Object.fromEntries(formData.entries())); // 🔍 Debug
+    // Stocker le token dans le localStorage
+    localStorage.setItem(`agent_token_${response.data.agent.id}`, response.data.token);
 
-    const response = await axios.post(
-      "https://fcf6-137-255-41-249.ngrok-free.app/api/register",
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
-
-    console.log("Réponse API :", response.data); // 🔍 Debug
-
-    agents.value.push(response.data);
     closeModal();
   } catch (error) {
-  if (axios.isAxiosError(error)) {
-    console.error("Erreur API :", error.response?.data || error.message);
-  } else {
-    console.error("Erreur inconnue :", error);
+    console.error("Erreur lors de l'ajout de l'agent :", error);
   }
-}
 };
 
-// ✅ Charger les agents au montage
-onMounted(fetchAgents);
+const openEditModal = (agent: Agent) => {
+  currentAgent.value = { ...agent };
+  previewEditPhoto.value = null;
+  showEditModal.value = true;
+};
+
+const closeEditModal = () => {
+  showEditModal.value = false;
+  currentAgent.value = null;
+  previewEditPhoto.value = null;
+};
+
+const handleEditImageUpload = (event: Event) => {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (file && ["image/png", "image/jpg", "image/jpeg"].includes(file.type)) {
+    previewEditPhoto.value = URL.createObjectURL(file);
+    if (currentAgent.value) {
+      currentAgent.value.photo_agent = file;
+    }
+  } else {
+    alert("Le format de l'image doit être PNG, JPG ou JPEG.");
+  }
+};
+
+const updateAgent = async () => {
+  try {
+    const formData = new FormData();
+    formData.append("nom_agent", currentAgent.value!.nom_agent);
+    formData.append("prenom_agent", currentAgent.value!.prenom_agent);
+    formData.append("mail_agent", currentAgent.value!.mail_agent);
+
+    const response = await axios.put(`http://127.0.0.1:8000/api/agent/${currentAgent.value!.id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    });
+
+    const updatedAgent = response.data.agent;
+
+    const index = agents.value.findIndex(agent => agent.id === updatedAgent.id);
+    if (index !== -1) {
+      agents.value[index] = { ...updatedAgent, photo_url: response.data.photo_url || previewEditPhoto.value };
+    }
+
+    closeEditModal();
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour de l'agent :", error);
+  }
+};
+
+const deleteAgent = async (id: number) => {
+  try {
+    await axios.delete(`http://127.0.0.1:8000/api/agent/${id}`);
+    agents.value = agents.value.filter(agent => agent.id !== id);
+  } catch (error) {
+    console.error("Erreur lors de la suppression de l'agent :", error);
+  }
+};
 </script>
+
+
 
 <style scoped>
 /* Conteneur principal */
-.agents-container {
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
   padding: 20px;
-  background: #f8fafc;
-  min-height: 100vh;
+}
+
+.agent-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  padding: 20px;
+  transition: transform 0.2s;
+}
+
+.agent-card:hover {
+  transform: scale(1.05);
+}
+
+.agent-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.agent-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ccc;
+}
+
+.agent-name {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.agent-role {
+  font-size: 14px;
+  color: #555;
+}
+
+.agent-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+.btn-edit {
+  background: rgb(154, 175, 160);
+  color: black;
+}
+
+.btn-edit:hover {
+  background: #7cb46f;
+}
+
+.btn-delete {
+  background: rgb(154, 175, 160);
+  color: black;
+}
+
+.btn-delete:hover {
+  background: #d05860;
 }
 
 /* En-tête */
@@ -213,17 +372,147 @@ onMounted(fetchAgents);
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6); /* Plus sombre pour un contraste plus fort */
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px); /* Effet de flou derrière la modale */
 }
 
 .modal-content {
-  background: white;
-  padding: 20px;
+  background: linear-gradient(145deg, #ffffff, #f0f4f3); /* Léger dégradé pour un effet de profondeur */
+  padding: 25px;
+  border-radius: 15px;
+  width: 480px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.modal-content:hover {
+  transform: translateY(-5px); /* Effet de lévitation subtil */
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-size: 22px;
+  font-weight: bold;
+  color: #01712b; /* Couleur principale pour le titre */
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.close-modal:hover {
+  color: #01712b; /* Changement de couleur au survol */
+}
+
+/* ✅ Style pour les champs du formulaire */
+.input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  width: 400px;
+  font-size: 15px;
+  background-color: #f9fafb;
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Légère ombre intérieure */
+}
+
+.input:focus {
+  border-color: #01712b;
+  background-color: white;
+  outline: none;
+  box-shadow: 0 0 10px rgba(1, 113, 43, 0.3); /* Effet de glow au focus */
+}
+
+/* ✅ Style pour les boutons */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.btn-cancel,
+.btn-save {
+  background: linear-gradient(135deg, rgb(154, 175, 160), #a1b5a7); /* Gradient léger pour plus de profondeur */
+  color: black;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-cancel:hover,
+.btn-save:hover {
+  background: linear-gradient(135deg, #01712b, #02a045); /* Vert plus vif au survol */
+  color: white;
+  transform: translateY(-2px); /* Légère élévation au survol */
+}
+
+/* ✅ Style pour les messages */
+.loading-text {
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.error-text {
+  font-size: 14px;
+  color: #d9534f; /* Rouge plus doux et moderne */
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* ✅ Spinner stylisé */
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #01712b;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ✅ Responsive Design */
+@media (max-width: 600px) {
+  .modal-content {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .modal-title {
+    font-size: 20px;
+  }
+
+  .btn-cancel, .btn-save {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
 }
 
 .input {

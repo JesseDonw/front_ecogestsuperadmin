@@ -70,24 +70,31 @@ export default {
     const errorMessage = ref("");
 
     const registerAdmin = async () => {
-      try {
-        const response = await axios.post(
-          "https://fcf6-137-255-41-249.ngrok-free.app/api/registeradmin",
-          admin.value
-        );
-        localStorage.setItem("token", response.data.token);
+  try {
+    const response = await axios.post(
+      "http://localhost:8000/api/registeradmin",
+      admin.value
+    );
 
-        router.push("/login");
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.error("Erreur d'inscription :", error.response?.data || error.message);
-          errorMessage.value = error.response?.data?.message || "Erreur lors de l'inscription";
-        } else {
-          console.error("Une erreur inconnue est survenue", error);
-          errorMessage.value = "Une erreur inconnue est survenue.";
-        }
-      }
-    };
+    console.log("Réponse de l'API :", response.data);  // Vérifie si le token est présent
+
+    if (response.data.token) {
+      localStorage.setItem("token", response.data.token);  // Stocke le token
+      router.push("/login");  // Redirige vers le tableau de bord après inscription
+    } else {
+      errorMessage.value = "Aucun token reçu. Vérifiez l'API.";
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Erreur d'inscription :", error.response?.data || error.message);
+      errorMessage.value = error.response?.data?.message || "Erreur lors de l'inscription";
+    } else {
+      console.error("Une erreur inconnue est survenue", error);
+      errorMessage.value = "Une erreur inconnue est survenue.";
+    }
+  }
+};
+
 
     return { admin, registerAdmin, errorMessage };
   },

@@ -57,26 +57,41 @@ export default {
   name: "LoginView",
   setup() {
     const router = useRouter();
+
+    // Champs de connexion
     const credentials = ref({
       mail_admin: "",
       mdp_admin: "",
     });
 
+    // Message d'erreur en cas d'échec
     const errorMessage = ref("");
 
+    // Fonction de connexion
     const loginUser = async () => {
       try {
-        const response = await axios.post("https://fcf6-137-255-41-249.ngrok-free.app/api/loginadmin", credentials.value);
+        const response = await axios.post("http://localhost:8000/api/loginadmin", credentials.value);
 
-        // ✅ Stocker le token et l'utilisateur
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("admin", JSON.stringify(response.data.admin));
+        if (response.data.token) {
+          // ✅ Stockage du token et des informations admin
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("admin", JSON.stringify(response.data.admin));
 
-        router.push("/");
+          console.log("Connexion réussie. Token stocké :", response.data.token);
+
+          // Redirection après connexion réussie
+          router.push("/");
+        } else {
+          // Si le token n'est pas présent dans la réponse
+          console.error("Aucun token reçu lors de la connexion.");
+          errorMessage.value = "Erreur lors de la connexion : token non reçu.";
+        }
       } catch (error) {
         if (axios.isAxiosError(error)) {
+          console.error("Erreur lors de la connexion :", error.response?.data || error.message);
           errorMessage.value = error.response?.data?.message || "Erreur lors de la connexion";
         } else {
+          console.error("Une erreur inconnue est survenue :", error);
           errorMessage.value = "Une erreur inconnue est survenue.";
         }
       }
