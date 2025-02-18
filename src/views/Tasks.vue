@@ -27,7 +27,7 @@
             <td>{{ task.id }}</td>
             <td>{{ task.date_envoie_tache }}</td>
             <td>{{ task.nom_tache }}</td>
-            <td>{{ task.localisation ? task.localisation.location : 'Non défini' }}</td>
+            <td>{{ task.localisation ? task.localisation.location + ' (' + task.localisation.latitude + ', ' + task.localisation.longitude + ')': 'Non défini'  }}</td>
             <td>
               <select v-model="task.statut" class="input" @change="updateTaskStatus(task)">
                 <option value="en attente">En attente</option>
@@ -68,6 +68,8 @@ import UpdateTaskForm from "@/components/UpdateTaskForm.vue";
 interface Location {
   id: number;
   location: string;
+  latitude:number;
+  longitude: number;
 }
 
 interface Task {
@@ -99,12 +101,14 @@ const fetchTasks = async () => {
 // ✅ Ajouter une nouvelle tâche depuis le composant enfant
 const addNewTask = (newTask: Task) => {
   tasks.value.push(newTask);
+  fetchTasks();
 };
 
 // ✅ Mettre à jour uniquement le statut d'une tâche
 const updateTaskStatus = async (task: Task) => {
   try {
     await axios.put(`http://127.0.0.1:8000/api/taches/${task.id}`, { statut: task.statut });
+    fetchTasks();
     console.log("✅ Statut mis à jour :", task.statut);
   } catch (error) {
     console.error("❌ Erreur lors de la mise à jour du statut :", error);
@@ -139,6 +143,7 @@ const updateTaskInList = (updatedTask: Task) => {
 const deleteTask = async (id: number) => {
   try {
     await axios.delete(`http://127.0.0.1:8000/api/taches/${id}`);
+    fetchTasks();
     tasks.value = tasks.value.filter((task) => task.id !== id);
     console.log("✅ Tâche supprimée avec succès !");
   } catch (error) {

@@ -103,7 +103,7 @@ const previewPhoto = ref<string | null>(null);
 const previewEditPhoto = ref<string | null>(null);
 const currentAgent = ref<Agent | null>(null);
 
-const defaultPhoto = "https://dummyimage.com/80x80/000/fff";
+const defaultPhoto = "https://ui-avatars.com/api/?name=AG&background=0D8ABC&color=fff&size=80";
 
 const newAgent = ref<Omit<Agent, "id"> & { mdp_agent: string }>({
   nom_agent: "",

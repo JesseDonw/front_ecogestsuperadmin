@@ -5,10 +5,11 @@
     <!-- 📦 Section Widgets -->
     <div class="widgets-container">
       <div class="widget fade-in">
-        <h3>🚛 Collectes Aujourd’hui</h3>
-        <p class="big-number">{{ totalCollections }}</p>
-        <p>+{{ additionalCollections }} collectes supplémentaires</p>
-      </div>
+        <h3>🚛 Nombre de tâches </h3>
+    <p class="big-number">{{ totalCollections }}</p>
+    <p>Tâches en attente: {{ pendingCollections }}</p>
+    <p>Tâches terminées: {{ completedCollections }}</p>
+  </div>
 
       <div class="widget fade-in">
         <h3>♻️ Taux de Recyclage</h3>
@@ -44,6 +45,7 @@ import { useRouter } from "vue-router";
 import PieChart from "@/components/PieChart.vue";
 import BarChart from "@/components/BarChart.vue";
 import LineChart from "@/components/LineChart.vue";
+import axios from 'axios';
 
 // ✅ Définition des types
 interface Task {
@@ -53,11 +55,14 @@ interface Task {
 }
 
 // ✅ Définition des variables réactives avec types explicites
-const totalCollections = ref<number>(0);
-const additionalCollections = ref<number>(0);
+const totalCollections = ref(0);
+
+const pendingCollections = ref(0); // Tâches en attente
+const completedCollections = ref(0); // Tâches terminées
 const recyclingRateData = ref<number[]>([]);
 const pollutionData = ref<number[]>([]);
 const recyclingTrend = ref<number[]>([]);
+
 const tasks = ref<Task[]>([]);
 
 
@@ -75,8 +80,8 @@ const fetchData = async () => {
   try {
     // Simuler un appel API avec setTimeout
     setTimeout(() => {
-      totalCollections.value = 18;
-      additionalCollections.value = 5;
+
+
       recyclingRateData.value = [40, 30, 20, 10]; // Ex: verre, plastique, métal, autres
       pollutionData.value = [100, 150, 200, 250]; // Ex: données de pollution
       recyclingTrend.value = [10, 20, 30, 50, 80, 100]; // Ex: tendance recyclage
@@ -93,6 +98,28 @@ const fetchData = async () => {
 
 // ✅ Charger les données au montage
 onMounted(fetchData);
+
+
+/// Fonction pour récupérer les tâches depuis l'API
+const getTaskCount = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/tasks/count/sorted-by-location'); // URL de ton API Laravel
+
+    // Mise à jour des variables avec les données de la réponse
+    totalCollections.value = response.data.total_tasks; // Total des tâches
+    pendingCollections.value = response.data.pending_tasks; // Tâches en attente
+    completedCollections.value = response.data.completed_tasks; // Tâches terminées
+
+
+  } catch (error) {
+    console.error('Erreur lors de la récupération des tâches :', error);
+  }
+};
+
+// Appeler la fonction au montage du composant
+onMounted(() => {
+  getTaskCount();
+});
 </script>
 
 <style scoped>
@@ -119,6 +146,7 @@ onMounted(fetchData);
   text-align: center;
   transition: transform 0.3s ease-in-out;
 }
+
 
 .widget:hover {
   transform: scale(1.05);

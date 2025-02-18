@@ -52,6 +52,10 @@ const navigateTo = (route: string) => {
           <FontAwesomeIcon :icon="faUsers" />
           <span v-if="!isCollapsed">Agents</span>
         </li>
+        <li @click="navigateTo('/administrateurs')" :class="{ active: $route.path === '/administrateurs' }">
+          <FontAwesomeIcon :icon="faUsers" />
+          <span v-if="!isCollapsed">Administrateurs</span>
+        </li>
       </ul>
     </nav>
   </div>
@@ -65,14 +69,14 @@ const navigateTo = (route: string) => {
   left: 0;
   width: 250px;
   height: 100vh;
-  background: #01712B;
-  border-right: 1px solid #e5e7eb;
+  background: white;
   transition: width 0.3s ease-in-out;
   display: flex;
   flex-direction: column;
   padding: 10px;
   overflow: hidden;
 }
+/**/
 
 .collapsed {
   width: 80px;
@@ -105,7 +109,7 @@ nav ul li {
 }
 
 nav ul li:hover {
-  background: #f3f4f6;
+  background: #01712B;
 }
 
 nav ul li.active {

@@ -17,11 +17,11 @@
       <!-- 🧑 Profil utilisateur -->
       <div class="profile-menu">
         <img
-          :src="user.profilePicture || 'https://via.placeholder.com/40'"
-          alt="User"
-          class="avatar"
-          @click.stop="toggleProfileMenu"
-        />
+      :src="user.profilePicture || defaultPhoto"
+      alt="User Profile"
+      class="avatar"
+      @click.stop="toggleProfileMenu"
+    />
       </div>
     </div>
 
@@ -70,11 +70,15 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faBell, faUser, faSearch, faCog, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import { useUserStore } from "../stores/userStore";
 
+
+
 const router = useRouter();
 const showNotifications = ref(false);
 const showProfileMenu = ref(false);
 
 const userStore = useUserStore();
+const defaultPhoto = "https://ui-avatars.com/api/?name=Ad&background=0D8AC&color=fff&size=80";
+
 const user = ref(userStore.user || JSON.parse(localStorage.getItem("user") || "{}"));
 
 const toggleNotifications = () => {

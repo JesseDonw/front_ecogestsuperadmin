@@ -20,7 +20,7 @@
         <select v-model="task.localisation_id" class="input">
           <option disabled value="">Sélectionner une localisation</option>
           <option v-for="location in locations" :key="location.id" :value="location.id">
-            {{ location.location }}
+            {{ location.location }} ({{ location.latitude }}, {{ location.longitude }})
           </option>
         </select>
 
@@ -45,6 +45,8 @@ import axios from "axios";
 interface Location {
   id: number;
   location: string;
+  latitude:number;
+  longitude: number;
 }
 
 interface Task {

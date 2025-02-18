@@ -3,6 +3,9 @@
   <div class="chat-container">
     <!-- Liste des clients -->
     <div class="sidebar left">
+      <div class="user-profile">
+        <input type="text" placeholder="Search..." class="search-bar" />
+      </div>
       <h2>Clients</h2>
       <ul>
         <li v-for="client in clients" :key="client.id" @click="openChat(client)"
@@ -371,8 +374,8 @@ const getInitials = (fullName: string): string => {
 /* Effet focus sur la barre de recherche */
 .search-bar:focus {
   background: white;
-  border-color: #6b5ed2;
-  box-shadow: 0 0 10px rgba(107, 94, 210, 0.5);
+  border-color: #01712B;
+  box-shadow: 0 0 10px #4f986b;
 }
 /* Zone du chat */
 .chat-window {

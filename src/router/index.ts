@@ -7,6 +7,7 @@ import Agents from "@/views/Agents.vue";
 import Messages from "@/views/Messages.vue";
 import Profile from "@/views/Profile.vue";
 import Signup from "@/views/Signup.vue";
+import Administrateurs from "@/views/Administrateurs.vue";
 
 const routes = [
   { path: "/", name: "Dashboard", component: Dashboard }, // 🔥 Route ajoutée
@@ -16,7 +17,9 @@ const routes = [
   { path: "/agents", name: "Agents", component: Agents },
   { path: "/messages", name: "Messages", component: Messages },
   { path: "/profile", name: "Profile", component: Profile },
+  {path: "/administrateurs",name: "Administrateurs", component: Administrateurs},
   { path: "/signup", component: Signup },
+
 ];
 
 const router = createRouter({
