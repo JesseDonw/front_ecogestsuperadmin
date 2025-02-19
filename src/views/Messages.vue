@@ -145,7 +145,7 @@ const agents = ref<IAgent[]>([]);
 // Fonctions pour récupérer les clients et agents
 const fetchClients = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/api/clients');
+    const response = await axios.get('https://ecogest-e4b9c843b0a7.herokuapp.com/api/clients');
     clients.value = response.data.map((client: IClient) => ({
       ...client,
       id: `client-${client.id}`,
@@ -158,7 +158,7 @@ const fetchClients = async () => {
 
 const fetchAgents = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/api/agents');
+    const response = await axios.get('https://ecogest-e4b9c843b0a7.herokuapp.com/api/agents');
     agents.value = response.data.map((agent: IAgent) => ({
       ...agent,
       id: `agent-${agent.id}`,
@@ -174,7 +174,7 @@ const fetchMessages = async () => {
   if (!activeChat.value) return;
 
   try {
-    const response = await axios.get('http://localhost:8000/api/fetch-messages', {
+    const response = await axios.get('https://ecogest-e4b9c843b0a7.herokuapp.com/api/fetch-messages', {
       params: {
         with_id: parseInt(activeChat.value.id.replace(/^(client|agent|admin)-/, '')),
         with_type: activeChat.value.role === 'client'
@@ -257,7 +257,7 @@ const sendMessage = async () => {
   if (newMessage.value.trim() === '' || !activeChat.value) return;
 
   try {
-    const response = await axios.post('http://localhost:8000/api/send-message', {
+    const response = await axios.post('https://ecogest-e4b9c843b0a7.herokuapp.com/api/send-message', {
       sender_id: parseInt(user.id.replace('admin-', '')),
       sender_type: 'App\\Models\\Administrateur',
       receiver_id: parseInt(activeChat.value.id.replace(/^(client|agent)-/, '')),

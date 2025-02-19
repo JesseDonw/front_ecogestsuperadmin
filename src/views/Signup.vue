@@ -72,7 +72,7 @@ export default {
     const registerAdmin = async () => {
   try {
     const response = await axios.post(
-      "http://localhost:8000/api/registeradmin",
+      "https://ecogest-e4b9c843b0a7.herokuapp.com/api/registeradmin",
       admin.value
     );
 

@@ -79,7 +79,7 @@ const fetchLocations = async () => {
   errorMessage.value = "";
 
   try {
-    const response = await axios.get("http://127.0.0.1:8000/api/localisations");
+    const response = await axios.get("https://ecogest-e4b9c843b0a7.herokuapp.com/api/localisations");
     locations.value = response.data;
   } catch (error) {
     console.error("Erreur chargement localisations :", error);
@@ -95,7 +95,7 @@ const submitTask = async () => {
   try {
     console.log("Données envoyées :", task.value);
 
-    const response = await axios.post("http://127.0.0.1:8000/api/taches", {
+    const response = await axios.post("https://ecogest-e4b9c843b0a7.herokuapp.com/api/taches", {
       nom_tache: task.value.description, // ✅ Correction ici
       date_envoie_tache: task.value.date_envoie_tache,
       localisation_id: task.value.localisation_id,

@@ -80,11 +80,11 @@ const newAdmin = ref<Omit<Admin, "id"> & { mdp_admin: string }>({
   photo_admin: null,
 });
 
-const getPhotoUrl = (photoPath?: string) => photoPath ? `http://127.0.0.1:8000/${photoPath}` : defaultPhoto;
+const getPhotoUrl = (photoPath?: string) => photoPath ? `https://ecogest-e4b9c843b0a7.herokuapp.com/${photoPath}` : defaultPhoto;
 
 const fetchAdmins = async () => {
   try {
-    const response = await axios.get("http://localhost:8000/api/admins");  // Utilise la bonne route
+    const response = await axios.get("https://ecogest-e4b9c843b0a7.herokuapp.com/api/admins");  // Utilise la bonne route
     admins.value = response.data;  // Met à jour la liste des administrateurs
   } catch (error) {
     console.error("Erreur lors de la récupération des administrateurs :", error);
@@ -122,7 +122,7 @@ const addAdmin = async () => {
     formData.append("mdp_admin", newAdmin.value.mdp_admin);
     if (newAdmin.value.photo_admin) formData.append("photo_admin", newAdmin.value.photo_admin);
 
-    const response = await axios.post("http://127.0.0.1:8000/api/registeradmin", formData);
+    const response = await axios.post("https://ecogest-e4b9c843b0a7.herokuapp.com/api/registeradmin", formData);
 
     console.log("Réponse de l'API :", response.data);
 

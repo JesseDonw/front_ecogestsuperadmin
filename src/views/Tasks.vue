@@ -91,7 +91,7 @@ const taskToEdit = ref<Task | null>(null);
 // ✅ Charger les tâches depuis l'API Laravel
 const fetchTasks = async () => {
   try {
-    const response = await axios.get<Task[]>("http://127.0.0.1:8000/api/taches");
+    const response = await axios.get<Task[]>("https://ecogest-e4b9c843b0a7.herokuapp.com/api/taches");
     tasks.value = response.data;
   } catch (error) {
     console.error("❌ Erreur lors du chargement des tâches :", error);
@@ -107,7 +107,7 @@ const addNewTask = (newTask: Task) => {
 // ✅ Mettre à jour uniquement le statut d'une tâche
 const updateTaskStatus = async (task: Task) => {
   try {
-    await axios.put(`http://127.0.0.1:8000/api/taches/${task.id}`, { statut: task.statut });
+    await axios.put(`https://ecogest-e4b9c843b0a7.herokuapp.com/api/taches/${task.id}`, { statut: task.statut });
     fetchTasks();
     console.log("✅ Statut mis à jour :", task.statut);
   } catch (error) {
@@ -142,7 +142,7 @@ const updateTaskInList = (updatedTask: Task) => {
 // ✅ Supprimer une tâche
 const deleteTask = async (id: number) => {
   try {
-    await axios.delete(`http://127.0.0.1:8000/api/taches/${id}`);
+    await axios.delete(`https://ecogest-e4b9c843b0a7.herokuapp.com/api/taches/${id}`);
     fetchTasks();
     tasks.value = tasks.value.filter((task) => task.id !== id);
     console.log("✅ Tâche supprimée avec succès !");
