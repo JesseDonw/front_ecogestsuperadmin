@@ -87,6 +87,14 @@ const calendarOptions = ref({
   editable: true,
   selectable: true,
   events: events.value,
+  locale: "fr", // Ajout de la langue française
+  buttonText: { // Personnalisation des boutons
+    today: "Aujourd'hui",
+    month: "Mois",
+    week: "Semaine",
+    day: "Jour",
+    list: "Agenda"
+  },
   dateClick: (info: { dateStr: string }) => openModal(info.dateStr),
 });
 
