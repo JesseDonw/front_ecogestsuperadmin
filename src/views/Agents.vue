@@ -113,11 +113,11 @@ const newAgent = ref<Omit<Agent, "id"> & { mdp_agent: string }>({
   photo_agent: null,
 });
 
-const getPhotoUrl = (photoPath?: string) => photoPath ? `https://ecogest-e4b9c843b0a7.herokuapp.com/${photoPath}` : defaultPhoto;
+const getPhotoUrl = (photoPath?: string) => photoPath ? `https://ecogest1-69586dbc1b71.herokuapp.com/${photoPath}` : defaultPhoto;
 
 const fetchAgents = async () => {
   try {
-    const response = await axios.get("https://ecogest-e4b9c843b0a7.herokuapp.com/api/agents");
+    const response = await axios.get("https://ecogest1-69586dbc1b71.herokuapp.com/api/agents");
     agents.value = response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des agents :", error);
@@ -155,7 +155,7 @@ const addAgent = async () => {
     formData.append("mdp_agent", newAgent.value.mdp_agent);
     if (newAgent.value.photo_agent) formData.append("photo_agent", newAgent.value.photo_agent);
 
-    const response = await axios.post("https://ecogest-e4b9c843b0a7.herokuapp.com/api/register", formData);
+    const response = await axios.post("https://ecogest1-69586dbc1b71.herokuapp.com/api/register", formData);
     agents.value.push({ ...response.data.agent, photo_url: response.data.photo_url || previewPhoto.value });
 
     // Stocker le token dans le localStorage
@@ -198,7 +198,7 @@ const updateAgent = async () => {
     formData.append("prenom_agent", currentAgent.value!.prenom_agent);
     formData.append("mail_agent", currentAgent.value!.mail_agent);
 
-    const response = await axios.put(`https://ecogest-e4b9c843b0a7.herokuapp.com/api/agent/${currentAgent.value!.id}`, formData, {
+    const response = await axios.put(`https://ecogest1-69586dbc1b71.herokuapp.com/api/agent/${currentAgent.value!.id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       }
@@ -219,9 +219,9 @@ const updateAgent = async () => {
 
 const deleteAgent = async (id: number) => {
   try {
-    await axios.delete(`https://ecogest-e4b9c843b0a7.herokuapp.com/api/agent/${id}`);
+    await axios.delete(`https://ecogest1-69586dbc1b71.herokuapp.com/api/agent/${id}`);
     agents.value = agents.value.filter(agent => agent.id !== id);
-    
+
   } catch (error) {
     console.error("Erreur lors de la suppression de l'agent :", error);
   }

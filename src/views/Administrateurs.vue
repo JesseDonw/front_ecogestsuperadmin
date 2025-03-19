@@ -15,6 +15,10 @@
           <h2 class="admin-name">{{ admin.nom_admin }} {{ admin.prenom_admin }}</h2>
           <p class="admin-email">{{ admin.mail_admin }}</p>
         </div>
+        <div class="agent-actions">
+          <button class="btn btn-edit" @click="openEditModal(admin)">Modifier</button>
+          <button class="btn btn-delete" @click="deleteAdmin(admin.id)">Supprimer</button>
+        </div>
       </div>
     </div>
 
@@ -80,11 +84,11 @@ const newAdmin = ref<Omit<Admin, "id"> & { mdp_admin: string }>({
   photo_admin: null,
 });
 
-const getPhotoUrl = (photoPath?: string) => photoPath ? `https://ecogest-e4b9c843b0a7.herokuapp.com/${photoPath}` : defaultPhoto;
+const getPhotoUrl = (photoPath?: string) => photoPath ? `https://ecogest1-69586dbc1b71.herokuapp.com/${photoPath}` : defaultPhoto;
 
 const fetchAdmins = async () => {
   try {
-    const response = await axios.get("https://ecogest-e4b9c843b0a7.herokuapp.com/api/admins");  // Utilise la bonne route
+    const response = await axios.get("https://ecogest1-69586dbc1b71.herokuapp.com/api/admins");  // Utilise la bonne route
     admins.value = response.data;  // Met à jour la liste des administrateurs
   } catch (error) {
     console.error("Erreur lors de la récupération des administrateurs :", error);
@@ -122,7 +126,7 @@ const addAdmin = async () => {
     formData.append("mdp_admin", newAdmin.value.mdp_admin);
     if (newAdmin.value.photo_admin) formData.append("photo_admin", newAdmin.value.photo_admin);
 
-    const response = await axios.post("https://ecogest-e4b9c843b0a7.herokuapp.com/api/registeradmin", formData);
+    const response = await axios.post("https://ecogest1-69586dbc1b71.herokuapp.com/api/registeradmin", formData);
 
     console.log("Réponse de l'API :", response.data);
 
@@ -139,6 +143,23 @@ const addAdmin = async () => {
     console.error("Erreur lors de l'ajout de l'administrateur :", error);
   }
 };
+
+
+const openEditModal = (admin: Admin) => {
+  console.log("Ouverture de la modale d'édition pour :", admin);
+  showModal.value = true;
+  newAdmin.value = { ...admin, mdp_admin: "" }; // Pré-remplit les champs
+};
+
+const deleteAdmin = async (id: number) => {
+  try {
+    await axios.delete(`https://ecogest1-69586dbc1b71.herokuapp.com/api/admin/${id}`);
+    admins.value = admins.value.filter((admin: Admin) => admin.id !== id);
+  } catch (error) {
+    console.error("Erreur lors de la suppression de l'administrateur :", error);
+  }
+};
+
 </script>
 
 <style scoped>
@@ -209,6 +230,40 @@ const addAdmin = async () => {
   background: #025f24;
 }
 
+.agent-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+
+.btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+.btn-edit {
+  background: rgb(154, 175, 160);
+  color: black;
+}
+
+.btn-edit:hover {
+  background: #7cb46f;
+}
+
+.btn-delete {
+  background: rgb(154, 175, 160);
+  color: black;
+}
+
+.btn-delete:hover {
+  background: #d05860;
+}
 /* Modale */
 .modal-overlay {
   position: fixed;

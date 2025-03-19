@@ -1,49 +1,37 @@
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gray-100">
+  <div class="flex items-center justify-center min-h-screen bg-gray-100 px-4">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md text-center">
-      <!-- Titre -->
-      <h2 class="text-2xl font-bold text-gray-800">Connexion à votre espace</h2>
-      <p class="text-gray-500 text-sm mb-4">Utilisez votre email pour vous connecter.</p>
-
-      <!-- Message d'erreur -->
-      <p v-if="errorMessage" class="text-red-500 mt-2">{{ errorMessage }}</p>
-
-      <!-- Formulaire -->
-      <form @submit.prevent="loginUser" class="space-y-4">
-        <input type="email" v-model="credentials.mail_admin" class="input-field" placeholder="Adresse Email" required />
-        <input type="password" v-model="credentials.mdp_admin" class="input-field" placeholder="Mot de passe" required />
-        <button type="submit" class="btn-primary">Se connecter</button>
-      </form>
-      <!-- Options de Connexion -->
-      <p class="text-gray-500 my-4">Ou connectez-vous avec</p>
-
-      <div class="space-y-2">
-        <button class="btn-google">
-          <img
-            src="../assets/icons/google.png"
-            class="mr-2"
-            alt="Google Logo"
-            style="width: 20px; height: 20px; margin-right: 8px"
-          />
-          GOOGLE
-        </button>
-
-        <button class="btn-microsoft">
-          <img
-            src="../assets/icons/microsoft.png"
-            class="mr-2"
-            alt="Google Logo"
-            style="width: 20px; height: 20px; margin-right: 8px"
-          />
-          MICROSOFT
-        </button>
+      <!-- Logo -->
+      <div class="logo-container">
+        <img src="@/assets/logo.png" alt="Logo" class="logo" />
       </div>
 
-      <!-- Lien vers l'inscription -->
-      <p class="mt-4 text-gray-500">
-        Vous n'avez pas encore de compte ?
-        <router-link to="/signup" class="text-blue-500 hover:underline">Créer un compte</router-link>
-      </p>
+      <!-- Titre -->
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">Connexion à votre espace super-admin</h2>
+
+      <!-- Message d'erreur -->
+      <p v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</p>
+
+      <!-- Formulaire -->
+      <form @submit.prevent="loginUser">
+
+          <input
+            type="email"
+            v-model="credentials.mail_admin"
+            class="input-field"
+            placeholder="Adresse Email"
+            required
+          />
+          <input
+            type="password"
+            v-model="credentials.mdp_admin"
+            class="input-field"
+            placeholder="Mot de passe"
+            required
+          />
+
+        <button type="submit" class="btn-primary">Se connecter</button>
+      </form>
     </div>
   </div>
 </template>
@@ -70,7 +58,7 @@ export default {
     // Fonction de connexion
     const loginUser = async () => {
       try {
-        const response = await axios.post("https://ecogest-e4b9c843b0a7.herokuapp.com/api/loginadmin", credentials.value);
+        const response = await axios.post("https://ecogest1-69586dbc1b71.herokuapp.com/api/loginadmin", credentials.value);
 
         if (response.data.token) {
           // ✅ Stockage du token et des informations admin
@@ -111,6 +99,16 @@ export default {
   min-height: 100vh;
   background-color: #f3f4f6;
 }
+.logo-container {
+  display:flex;
+  justify-content:center;
+  margin-bottom: -50px;
+}
+
+.logo {
+  width: 290px;
+  height: 290px;
+}
 
 /* Conteneur du formulaire */
 .bg-white {
@@ -130,6 +128,7 @@ export default {
   font-size: 14px;
   background-color: #f9fafb;
   transition: all 0.3s ease;
+  margin-bottom: 16px;
 }
 .input-field:focus {
   border-color: #01712B;
@@ -152,30 +151,4 @@ export default {
   background-color: #01712B;
 }
 
-/* Boutons sociaux */
-.btn-google,
-.btn-microsoft {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-.btn-google {
-  background-color: white;
-  color: black;
-}
-.btn-google:hover {
-  background-color: #01712b;
-}
-.btn-microsoft {
-  background-color: white;
-  color: black;
-}
-.btn-microsoft:hover {
-  background-color: #01712b;
-}
 </style>

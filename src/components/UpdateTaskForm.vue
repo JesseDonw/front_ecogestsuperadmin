@@ -91,7 +91,7 @@ const fetchLocations = async () => {
   errorMessage.value = "";
 
   try {
-    const response = await axios.get("https://ecogest-e4b9c843b0a7.herokuapp.com/api/localisations");
+    const response = await axios.get("https://ecogest1-69586dbc1b71.herokuapp.com/api/localisations");
     locations.value = response.data;
   } catch (error) {
     handleApiError(error, "Impossible de charger les localisations.");
@@ -105,7 +105,7 @@ onMounted(fetchLocations);
 const updateTask = async () => {
   try {
     const response = await axios.put(
-      `https://ecogest-e4b9c843b0a7.herokuapp.com/api/taches/${task.value.id}`,
+      `https://ecogest1-69586dbc1b71.herokuapp.com/api/taches/${task.value.id}`,
       {
         nom_tache: task.value.description,
         date_envoie_tache: task.value.date_envoie_tache,

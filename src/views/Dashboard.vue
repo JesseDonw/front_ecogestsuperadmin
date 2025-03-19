@@ -103,7 +103,7 @@ onMounted(fetchData);
 /// Fonction pour récupérer les tâches depuis l'API
 const getTaskCount = async () => {
   try {
-    const response = await axios.get('https://ecogest-e4b9c843b0a7.herokuapp.com/api/tasks/count/sorted-by-location'); // URL de ton API Laravel
+    const response = await axios.get('https://ecogest1-69586dbc1b71.herokuapp.com/api/tasks/count/sorted-by-location'); // URL de ton API Laravel
 
     // Mise à jour des variables avec les données de la réponse
     totalCollections.value = response.data.total_tasks; // Total des tâches

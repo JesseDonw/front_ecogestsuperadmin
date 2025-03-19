@@ -98,17 +98,17 @@ import { ref } from "vue";
 const defaultPicture = "https://via.placeholder.com/120";
 
 const profile = ref({
-  username: "Admin Ad",
-  email: "admin@gmail.com",
-  firstName: "Ad",
+  username: "Super Admin",
+  email: "superad@gmail.com",
+  firstName: "Super",
   lastName: "Admin",
   address: "Rue des Entrepreneurs, Cotonou",
   city: "Cotonou",
   country: "Bénin",
   postalCode: "22900",
   about: "Spécialiste en gestion écologique et recyclage durable.",
-  role: "Responsable Opérations ECOGEST",
-  picture: "",
+  role: "Super Admin ECOGEST",
+  picture: "https://ui-avatars.com/api/?name=Ad&background=0D8AC&color=fff&size=80",
 });
 
 // Fonction pour modifier la photo de profil
